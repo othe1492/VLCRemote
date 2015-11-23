@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">VLC Remote</string>
+    <string name="password">Password</string>
+    <string name="adress">Adress</string>
+    <string name="connect">Connect</string>
+    <string name="time">Time:</string>
+    <string name="title_activity_slider_acivity">SliderAcivity</string>
+    <string name="title_activity_slider">SliderActivity</string>
+</resources>
