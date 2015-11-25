@@ -4,9 +4,11 @@ import android.util.Base64;
 import android.util.Log;
 import org.json.JSONObject;
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 
 /**
@@ -16,32 +18,20 @@ public class HTTPInterface extends Thread
 {
     private String m_password;
     private String m_address;
-    private String m_videoName;
-    private int m_currentTime;
-    private int m_length;
     private String m_error;
-    private Commands m_command;
 
     HTTPInterface(String address, String password)
     {
-        m_address = address;
+        if(address.contains("http://"))
+        {
+            m_address = address + "/requests/status.xml?command=";
+        }
+        else
+        {
+            m_address = "http://" + address + "/requests/status.xml?command=";
+        }
         m_password = password;
         m_error = "";
-    }
-
-    public String getVideoName()
-    {
-        return m_videoName;
-    }
-
-    public int getVideoLength()
-    {
-        return m_length;
-    }
-
-    public int getCurrentTime()
-    {
-        return m_currentTime;
     }
 
     public String getError()
@@ -49,20 +39,32 @@ public class HTTPInterface extends Thread
         return m_error;
     }
 
-    public void setCommand(Commands command)
+    // Parses and InputStream and puts it all into a string
+    private String parseInputStreamToString(InputStream is) throws IOException
     {
-        m_command = command;
+        BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+        String responseString = "", inputLine;
 
+        if(is != null)
+        {
+            while ((inputLine = reader.readLine()) != null)
+            {
+                responseString += inputLine + "\n";
+            }
+        }
+        return responseString;
     }
 
-    private void toHTTP(String command)
+    // Connects to a running VLC HTTP interface and sends command
+    // Returns a JSONObject containing information from VLC
+    private JSONObject toHTTP(String command)
     {
-        String url = "http://"  + m_address + "/requests/status.json?command=" + command;
-        HttpURLConnection connection;
-
+        InputStream responseStream = null;
+        HttpURLConnection connection = null;
+        JSONObject jsonResponse = null;
         try
         {
-            connection = (HttpURLConnection)new URL(url).openConnection();
+            connection = (HttpURLConnection)new URL(m_address + command).openConnection();
             connection.setRequestMethod("GET");
 
             String authInfo = ":" + m_password;
@@ -75,7 +77,9 @@ public class HTTPInterface extends Thread
             if(responseCode == 200)
             {
                 m_error = "";
-                parseResponse(connection.getInputStream());
+                responseStream = connection.getInputStream();
+                String responseString = parseInputStreamToString(responseStream);
+                jsonResponse = new JSONObject(responseString);
             }
             else if(responseCode == 401)
             {
@@ -105,58 +109,30 @@ public class HTTPInterface extends Thread
             m_error = "Unknown connection error";
             Log.d("EXCEPTION", "Cause is " + e.toString());
         }
-    }
-
-    private void parseResponse(InputStream response)
-    {
-        if(response != null)
+        finally
         {
-            try
-            {
-                BufferedReader reader = new BufferedReader(new InputStreamReader(response));
-                String responseString = "", inputLine;
-
-                while((inputLine = reader.readLine()) != null)
+            if (responseStream != null) {
+                try
                 {
-                    responseString += inputLine + "\n";
+                    responseStream.close();
                 }
-
-                JSONObject jsonResponse = new JSONObject(responseString);
-                m_videoName = jsonResponse.getJSONObject("information").getJSONObject("category").getJSONObject("meta").getString("filename");
-                m_currentTime = jsonResponse.getInt("time");
-                m_length = jsonResponse.getInt("length");
+                catch (IOException e)
+                {
+                    m_error= "Error closing input from VLC";
+                }
             }
-            catch(Exception e)
+            if (connection != null)
             {
-                Log.d("EXCEPTION", "Cause: " + e.toString());
+                connection.disconnect();
             }
         }
+
+        return jsonResponse;
     }
 
     public void run()
     {
-        switch (m_command) {
-            case play:
-                toHTTP("pl_forceresume");
-                break;
-            case pause:
-                toHTTP("pl_forcepause");
-                break;
-            case stop:
-                toHTTP("pl_stop");
-                break;
-            case next:
-                toHTTP("pl_next");
-                break;
-            case previous:
-                toHTTP("pl_previous");
-                break;
-            case toggleFullscreen:
-                toHTTP("fullscreen");
-                break;
-            case update:
-                toHTTP("");
-                break;
-        }
+        //Entry point for Thread.start()
+        toHTTP("pl_pause");
     }
 }

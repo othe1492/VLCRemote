@@ -5,6 +5,7 @@ import android.app.FragmentTransaction;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
@@ -21,62 +22,45 @@ public class SliderActivity extends FragmentActivity {
     private static final int NUM_PAGES = 3;
     private ViewPager mPager;
     private PagerAdapter mPagerAdapter;
-
+    private TabLayout mtabLayout;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_slider);
         mPager = (ViewPager) findViewById(R.id.pager);
 
-        // Actiobar tabs is deprecated
-        /*
-        final ActionBar actionBar = getActionBar();
-        actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+        // Instantiate a ViewPager and a PagerAdapter.
+        mPagerAdapter = new ScreenSlidePagerAdapter(getSupportFragmentManager());
+        mPager.setAdapter(mPagerAdapter);
 
+        mtabLayout = (TabLayout) findViewById(R.id.tab_layout);
+        mtabLayout.addTab(mtabLayout.newTab().setText("Connection"));
+        mtabLayout.addTab(mtabLayout.newTab().setText("Controls"));
+        mtabLayout.addTab(mtabLayout.newTab().setText("Playlist"));
+        mtabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
 
-        mPager.setOnPageChangeListener(
-                new ViewPager.SimpleOnPageChangeListener() {
-                    @Override
-                    public void onPageSelected(int position) {
-                        // When swiping between pages, select the
-                        // corresponding tab.
-                        getActionBar().setSelectedNavigationItem(position);
-                    }
-                });
-
-
-        ActionBar.TabListener tabListener = new ActionBar.TabListener() {
+        mPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(mtabLayout));
+        mtabLayout.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener()
+        {
             @Override
-            public void onTabSelected(ActionBar.Tab tab, FragmentTransaction ft) {
+            public void onTabSelected(TabLayout.Tab tab)
+            {
                 mPager.setCurrentItem(tab.getPosition());
             }
 
             @Override
-            public void onTabUnselected(ActionBar.Tab tab, FragmentTransaction ft) {
+            public void onTabUnselected(TabLayout.Tab tab)
+            {
 
             }
 
             @Override
-            public void onTabReselected(ActionBar.Tab tab, FragmentTransaction ft) {
+            public void onTabReselected(TabLayout.Tab tab)
+            {
 
             }
-        };
+        });
 
-        actionBar.addTab(actionBar.newTab()
-                .setText("Connect")
-                .setTabListener(tabListener));
-
-        actionBar.addTab(actionBar.newTab()
-                .setText("Controls")
-                .setTabListener(tabListener));
-
-        actionBar.addTab(actionBar.newTab()
-                .setText("Playlist")
-                .setTabListener(tabListener));
-        */
-        // Instantiate a ViewPager and a PagerAdapter.
-        mPagerAdapter = new ScreenSlidePagerAdapter(getSupportFragmentManager());
-        mPager.setAdapter(mPagerAdapter);
     }
 
     public void onBackPressed() {
@@ -94,7 +78,6 @@ public class SliderActivity extends FragmentActivity {
     {
         // Hardcoded for now for ease of testing
         HTTPInterface connection = new HTTPInterface("10.0.0.7:8000", "password");
-        connection.setCommand(Commands.update);
         new Thread(connection).start();
     }
 
