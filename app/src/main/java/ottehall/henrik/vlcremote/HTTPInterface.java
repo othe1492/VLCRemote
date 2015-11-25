@@ -16,27 +16,28 @@ import java.net.URL;
  */
 public class HTTPInterface extends Thread
 {
-    private String m_password;
-    private String m_address;
-    private String m_error;
+    private String mPassword;
+    private String mAddress;
+    private String mError;
 
     HTTPInterface(String address, String password)
     {
         if(address.contains("http://"))
         {
-            m_address = address + "/requests/status.xml?command=";
+            mAddress = address + "/requests/status.xml?command=";
         }
         else
         {
-            m_address = "http://" + address + "/requests/status.xml?command=";
+            mAddress = "http://" + address + "/requests/status.xml?command=";
         }
-        m_password = password;
-        m_error = "";
+        password = ":" + password;
+        mPassword = "Basic " + new String(Base64.encode(password.getBytes(), Base64.DEFAULT));
+        mError = "";
     }
 
     public String getError()
     {
-        return m_error;
+        return mError;
     }
 
     // Parses and InputStream and puts it all into a string
@@ -64,49 +65,46 @@ public class HTTPInterface extends Thread
         JSONObject jsonResponse = null;
         try
         {
-            connection = (HttpURLConnection)new URL(m_address + command).openConnection();
+            connection = (HttpURLConnection)new URL(mAddress + command).openConnection();
             connection.setRequestMethod("GET");
-
-            String authInfo = ":" + m_password;
-            authInfo = "Basic " + new String(Base64.encode(authInfo.getBytes(), Base64.DEFAULT));
-            connection.setRequestProperty("Authorization", authInfo);
+            connection.setRequestProperty("Authorization", mPassword);
 
             int responseCode = connection.getResponseCode();
             Log.d("RESPONSE", "Response code: " + Integer.toString(responseCode));
 
             if(responseCode == 200)
             {
-                m_error = "";
+                mError = "";
                 responseStream = connection.getInputStream();
                 String responseString = parseInputStreamToString(responseStream);
                 jsonResponse = new JSONObject(responseString);
             }
             else if(responseCode == 401)
             {
-                m_error = "Unable to connect: Unauthorized";
+                mError = "Unable to connect: Unauthorized";
             }
             else if(responseCode == 404)
             {
-                m_error = "Unable to connect: Not found";
+                mError = "Unable to connect: Not found";
             }
             else
             {
-                m_error = "Unknown connection error";
+                mError = "Unknown connection error";
             }
         }
         catch (java.net.MalformedURLException e)
         {
-            m_error = "Unable to connect: Incorrect address";
+            mError = "Unable to connect: Incorrect address";
             Log.d("EXCEPTION", "Cause is " + e.toString());
         }
         catch (java.net.ConnectException e)
         {
-            m_error = "Unable to connect: Timeout";
+            mError = "Unable to connect: Timeout";
             Log.d("EXCEPTION", "Cause is " + e.toString());
         }
         catch (Exception e)
         {
-            m_error = "Unknown connection error";
+            mError = "Unknown connection error";
             Log.d("EXCEPTION", "Cause is " + e.toString());
         }
         finally
@@ -118,7 +116,7 @@ public class HTTPInterface extends Thread
                 }
                 catch (IOException e)
                 {
-                    m_error= "Error closing input from VLC";
+                    mError= "Error closing input from VLC";
                 }
             }
             if (connection != null)
@@ -133,6 +131,6 @@ public class HTTPInterface extends Thread
     public void run()
     {
         //Entry point for Thread.start()
-        toHTTP("pl_pause");
+        toHTTP("");
     }
 }

@@ -9,18 +9,25 @@ import org.json.JSONObject;
  */
 public class VLCInstance
 {
-    private String m_videoName;
-    private int m_currentTime;
-    private int m_length;
-    private Commands m_command;
+    private HTTPInterface mConnection;
+    private String mVideoName;
+    private int mCurrentTime;
+    private int mLength;
+    private Commands mCommand;
+
+    public VLCInstance(String address, String password)
+    {
+        mConnection = new HTTPInterface(address, password);
+        mConnection.start();
+    }
 
     private void parseResponse(JSONObject response)
     {
         try
         {
-            m_videoName = response.getJSONObject("information").getJSONObject("meta").getString("filename");
-            m_currentTime = response.getInt("time");
-            m_length = response.getInt("length");
+            mVideoName = response.getJSONObject("information").getJSONObject("meta").getString("filename");
+            mCurrentTime = response.getInt("time");
+            mLength = response.getInt("length");
         }
         catch (JSONException e)
         {
