@@ -8,20 +8,24 @@ import android.view.View;
 import android.widget.EditText;
 
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity
+{
 
-    VLCInstance instance;
+    VLCInstance instance = null;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        // Create tabs
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tab_layout);
         tabLayout.addTab(tabLayout.newTab().setText("Connection"));
         tabLayout.addTab(tabLayout.newTab().setText("Controls"));
         tabLayout.addTab(tabLayout.newTab().setText("Playlist"));
         tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
 
+        // Set up the ViewPager for sliding pages
         final ViewPager viewPager = (ViewPager)findViewById(R.id.pager);
         final PageAdapter adapter = new PageAdapter(getSupportFragmentManager(), tabLayout.getTabCount());
 
@@ -31,6 +35,14 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onTabSelected(TabLayout.Tab tab)
             {
+                if(instance != null)
+                {
+                    instance.setVisible(tab.getPosition());
+                    if(tab.getPosition() == 2)
+                    {
+                        instance.setCommand(Commands.getPlayList);
+                    }
+                }
                 viewPager.setCurrentItem(tab.getPosition());
             }
 

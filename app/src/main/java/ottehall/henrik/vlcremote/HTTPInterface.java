@@ -14,7 +14,7 @@ import java.net.URL;
 /**
  * Created by Henrik on 2015-11-21.
  */
-public class HTTPInterface extends Thread
+public class HTTPInterface
 {
     private String mPassword;
     private String mAddress;
@@ -24,11 +24,11 @@ public class HTTPInterface extends Thread
     {
         if(address.contains("http://"))
         {
-            mAddress = address + "/requests/status.json?command=";
+            mAddress = address;
         }
         else
         {
-            mAddress = "http://" + address + "/requests/status.json?command=";
+            mAddress = "http://" + address;
         }
         password = ":" + password;
         mPassword = "Basic " + new String(Base64.encode(password.getBytes(), Base64.DEFAULT));
@@ -56,16 +56,30 @@ public class HTTPInterface extends Thread
         return responseString;
     }
 
-    // Connects to a running VLC HTTP interface and sends command
+    // Used to send a command to the VLC HTTP interface
     // Returns a JSONObject containing information from VLC
     public JSONObject SendCommand(String command)
+    {
+        return toHTTP(mAddress + "/requests/status.json?command=" + command);
+    }
+
+    // Gets the playlist from a running VLC
+    public JSONObject GetPlaylist()
+    {
+        return toHTTP(mAddress + "/requests/playlist.json");
+    }
+
+    // Connects to a running VLC HTTP interface and sends command
+    // Returns a JSONObject containing information from VLC
+    private JSONObject toHTTP(String address)
     {
         InputStream responseStream = null;
         HttpURLConnection connection = null;
         JSONObject jsonResponse = null;
+
         try
         {
-            connection = (HttpURLConnection)new URL(mAddress + command).openConnection();
+            connection = (HttpURLConnection)new URL(address).openConnection();
             connection.setRequestMethod("GET");
             connection.setRequestProperty("Authorization", mPassword);
 
@@ -81,30 +95,30 @@ public class HTTPInterface extends Thread
             }
             else if(responseCode == 401)
             {
-                mError = "Unable to connect: Unauthorized";
+                mError = "Unauthorized";
             }
             else if(responseCode == 404)
             {
-                mError = "Unable to connect: Not found";
+                mError = "Not found";
             }
             else
             {
-                mError = "Unknown connection error";
+                mError = "Unknown error";
             }
         }
         catch (java.net.MalformedURLException e)
         {
-            mError = "Unable to connect: Incorrect address";
+            mError = "Incorrect address";
             Log.d("EXCEPTION", "Cause is " + e.toString());
         }
         catch (java.net.ConnectException e)
         {
-            mError = "Unable to connect: Timeout";
+            mError = "Timeout";
             Log.d("EXCEPTION", "Cause is " + e.toString());
         }
         catch (Exception e)
         {
-            mError = "Unknown connection error";
+            mError = "Unknown error";
             Log.d("EXCEPTION", "Cause is " + e.toString());
         }
         finally
@@ -126,10 +140,5 @@ public class HTTPInterface extends Thread
         }
 
         return jsonResponse;
-    }
-
-    public void run()
-    {
-        //Entry point for Thread.start()
     }
 }
