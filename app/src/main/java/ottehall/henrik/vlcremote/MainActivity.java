@@ -52,6 +52,7 @@ public class MainActivity extends AppCompatActivity {
     {
         EditText address = (EditText)findViewById(R.id.txtAdress);
         EditText password = (EditText)findViewById(R.id.txtPassword);
-        instance = new VLCInstance(address.getText().toString(), password.getText().toString());
+        instance = new VLCInstance(this, address.getText().toString(), password.getText().toString());
+        instance.start();
     }
 }

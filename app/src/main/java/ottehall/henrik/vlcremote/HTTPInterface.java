@@ -24,11 +24,11 @@ public class HTTPInterface extends Thread
     {
         if(address.contains("http://"))
         {
-            mAddress = address + "/requests/status.xml?command=";
+            mAddress = address + "/requests/status.json?command=";
         }
         else
         {
-            mAddress = "http://" + address + "/requests/status.xml?command=";
+            mAddress = "http://" + address + "/requests/status.json?command=";
         }
         password = ":" + password;
         mPassword = "Basic " + new String(Base64.encode(password.getBytes(), Base64.DEFAULT));
@@ -58,7 +58,7 @@ public class HTTPInterface extends Thread
 
     // Connects to a running VLC HTTP interface and sends command
     // Returns a JSONObject containing information from VLC
-    private JSONObject toHTTP(String command)
+    public JSONObject SendCommand(String command)
     {
         InputStream responseStream = null;
         HttpURLConnection connection = null;
@@ -131,6 +131,5 @@ public class HTTPInterface extends Thread
     public void run()
     {
         //Entry point for Thread.start()
-        toHTTP("");
     }
 }
