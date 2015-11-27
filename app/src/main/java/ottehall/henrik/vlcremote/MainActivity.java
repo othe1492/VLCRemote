@@ -29,6 +29,7 @@ public class MainActivity extends AppCompatActivity
         final ViewPager viewPager = (ViewPager)findViewById(R.id.pager);
         final PageAdapter adapter = new PageAdapter(getSupportFragmentManager(), tabLayout.getTabCount());
 
+        // Set adapters and listeners for page changing
         viewPager.setAdapter(adapter);
         viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
         tabLayout.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
@@ -66,5 +67,32 @@ public class MainActivity extends AppCompatActivity
         EditText password = (EditText)findViewById(R.id.txtPassword);
         instance = new VLCInstance(this, address.getText().toString(), password.getText().toString());
         instance.start();
+    }
+
+    public void controlButtonClick(View view)
+    {
+        Commands command = Commands.none;
+
+        if(view == findViewById(R.id.btnPrevious))
+        {
+            instance.setCommand(Commands.previous);
+        }
+        else if(view == findViewById(R.id.btnPlay))
+        {
+            instance.setCommand(Commands.play);
+        }
+        else if(view == findViewById(R.id.btnPause))
+        {
+            instance.setCommand(Commands.pause);
+        }
+        else if(view == findViewById(R.id.btnStop))
+        {
+            instance.setCommand(Commands.stop);
+        }
+        else if(view == findViewById(R.id.btnNext))
+        {
+            instance.setCommand(Commands.next);
+        }
+
     }
 }

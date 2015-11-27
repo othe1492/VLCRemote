@@ -13,9 +13,11 @@
         android:id="@+id/txtTitle"
         android:singleLine="true" />
 
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        android:orientation="horizontal" android:layout_width="match_parent"
-        android:layout_height="match_parent">
+    <LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
 
         <TextView
             android:layout_width="wrap_content"
@@ -32,6 +34,80 @@
             android:padding="5dp"
             android:id="@+id/txtTimer"
             android:layout_gravity="center_horizontal" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:paddingTop="10dp">
+
+        <ImageButton
+            android:id="@+id/btnPrevious"
+            android:contentDescription="Previous"
+            android:padding="5dp"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:scaleType="fitCenter"
+            android:adjustViewBounds="true"
+            android:cropToPadding="false"
+            android:src="@drawable/previous"
+            android:background="#FFFFFF"
+            android:onClick="controlButtonClick"/>
+
+        <ImageButton
+            android:id="@+id/btnPlay"
+            android:contentDescription="Play"
+            android:padding="5dp"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:scaleType="fitCenter"
+            android:adjustViewBounds="true"
+            android:cropToPadding="false"
+            android:src="@drawable/play"
+            android:background="#FFFFFF"
+            android:onClick="controlButtonClick"/>
+
+        <ImageButton
+            android:id="@+id/btnPause"
+            android:contentDescription="Pause"
+            android:padding="5dp"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:scaleType="fitCenter"
+            android:adjustViewBounds="true"
+            android:cropToPadding="false"
+            android:src="@drawable/pause"
+            android:background="#FFFFFF"
+            android:onClick="controlButtonClick"/>
+
+        <ImageButton
+            android:id="@+id/btnStop"
+            android:contentDescription="Stop"
+            android:padding="5dp"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:scaleType="fitCenter"
+            android:adjustViewBounds="true"
+            android:cropToPadding="false"
+            android:src="@drawable/stop"
+            android:background="#FFFFFF"
+            android:onClick="controlButtonClick"/>
+
+        <ImageButton
+            android:id="@+id/btnNext"
+            android:contentDescription="Next"
+            android:padding="5dp"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:scaleType="fitCenter"
+            android:adjustViewBounds="true"
+            android:cropToPadding="false"
+            android:src="@drawable/next"
+            android:background="#FFFFFF"
+            android:onClick="controlButtonClick"/>
+
     </LinearLayout>
 
 </LinearLayout>
