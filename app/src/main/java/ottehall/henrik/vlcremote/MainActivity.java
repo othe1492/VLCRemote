@@ -1,11 +1,16 @@
 package ottehall.henrik.vlcremote;
 
 import android.os.Bundle;
+
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
+
 import android.view.View;
+
+import android.widget.AdapterView;
 import android.widget.EditText;
+import android.widget.ListView;
 
 
 public class MainActivity extends AppCompatActivity
@@ -34,31 +39,39 @@ public class MainActivity extends AppCompatActivity
         viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
         tabLayout.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
-            public void onTabSelected(TabLayout.Tab tab)
-            {
-                if(instance != null)
-                {
+            public void onTabSelected(TabLayout.Tab tab) {
+                viewPager.setCurrentItem(tab.getPosition());
+
+                if (instance != null) {
                     instance.setVisible(tab.getPosition());
-                    if(tab.getPosition() == 2)
-                    {
+                    if (tab.getPosition() == 2) {
                         instance.setCommand(Commands.getPlayList);
+                        ListView playlistView = (ListView) findViewById(R.id.playlistView);
+
+                        playlistView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                            @Override
+                            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                                instance.setVideo(id);
+                            }
+                        });
                     }
                 }
-                viewPager.setCurrentItem(tab.getPosition());
-            }
-
-            @Override
-            public void onTabUnselected(TabLayout.Tab tab)
-            {
 
             }
 
             @Override
-            public void onTabReselected(TabLayout.Tab tab)
-            {
+            public void onTabUnselected(TabLayout.Tab tab) {
+
+            }
+
+            @Override
+            public void onTabReselected(TabLayout.Tab tab) {
 
             }
         });
+
+
+
     }
 
     public void startConnection(View view)

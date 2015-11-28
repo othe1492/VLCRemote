@@ -34,6 +34,7 @@ public class VLCInstance extends Thread
     private List<String> mPlaylist;
     private int mUpdateTiming;
     private Commands mCommand;
+    private long mPlaylistIndex;
 
     public VLCInstance(Activity activity, String address, String password)
     {
@@ -52,6 +53,12 @@ public class VLCInstance extends Thread
         mCommand = command;
     }
 
+    public void setVideo(long playlistIndex)
+    {
+        mPlaylistIndex = playlistIndex;
+        mCommand = Commands.setVideo;
+    }
+
     public void setVisible(int visible)
     {
         mTabVisible = visible;
@@ -62,6 +69,7 @@ public class VLCInstance extends Thread
         }
     }
 
+    // Entry point for thread.start()
     public void run()
     {
         mUpdateTiming = TIME_FOR_UPDATE;
@@ -69,6 +77,7 @@ public class VLCInstance extends Thread
         runLoop();
     }
 
+    // Thread eventloop
     private void runLoop()
     {
         try {
@@ -114,6 +123,12 @@ public class VLCInstance extends Thread
                     case getPlayList:
                         Log.d("COMMAND", mCommand.toString());
                         getPlaylist();
+                        mCommand = Commands.none;
+                        break;
+                    case setVideo:
+                        // TODO: id is not same as index, need to save id from VLC
+                        Log.d("COMMAND", mCommand.toString() + " " + mPlaylistIndex);
+                        sendCommandAndParse("pl_play&id=" + mPlaylistIndex);
                         mCommand = Commands.none;
                         break;
                 }
